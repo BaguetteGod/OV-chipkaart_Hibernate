@@ -1,16 +1,32 @@
 package P6.Domain;
 
+import javax.persistence.*;
 import java.sql.Date;
 import java.util.List;
 
+@Entity
 public class Reiziger {
 
+    @SequenceGenerator(
+            name = "reiziger_sequence",
+            sequenceName = "reiziger_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "reiziger_sequence"
+    )
+    @Id
+    @Column(name = "reiziger_id")
     private int id;
     private String voorletters;
     private String tussenvoegsel;
     private String achternaam;
     private Date geboortedatum;
+    @OneToOne(mappedBy = "reiziger")
+    @JoinColumn(name = "adres_id")
     private Adres adres;
+    @Transient
     private List<OVChipkaart> ovChipkaartList;
 
     public Reiziger(int id, String voorletters, String tussenvoegsel, String achternaam, Date geboortedatum) {
@@ -29,6 +45,10 @@ public class Reiziger {
     public Reiziger(int id, String voorletters, String tussenvoegsel, String achternaam, Date geboortedatum, List<OVChipkaart> ovChipkaartList) {
         this(id, voorletters, tussenvoegsel, achternaam, geboortedatum);
         this.ovChipkaartList = ovChipkaartList;
+    }
+
+    public Reiziger() {
+
     }
 
     public int getId() {

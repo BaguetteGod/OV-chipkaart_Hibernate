@@ -1,14 +1,34 @@
 package P6.Domain;
 
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
 public class Product {
+
+    @SequenceGenerator(
+            name = "product_sequence",
+            sequenceName = "product_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "product_sequence"
+    )
+    @Id
+    @Column(name = "product_nummer")
     private int id;
     private String naam;
     private String beschrijving;
     private Double prijs;
-    private List<Integer> ovChipkaartList = new ArrayList<>();
+    @ManyToMany
+    @JoinTable(
+            name = "ov_chipkaart_product",
+            joinColumns = @JoinColumn(name = "product_nummer"),
+            inverseJoinColumns = @JoinColumn(name = "kaart_nummer")
+    )
+    private List<OVChipkaart> ovChipkaartList = new ArrayList<>();
 
     public Product(int id, String naam, String beschrijving, Double prijs) {
         this.id = id;
@@ -17,7 +37,7 @@ public class Product {
         this.prijs = prijs;
     }
 
-    public Product(int id, String naam, String beschrijving, Double prijs, List<Integer> ovChipkaartList) {
+    public Product(int id, String naam, String beschrijving, Double prijs, List<OVChipkaart> ovChipkaartList) {
         this.id = id;
         this.naam = naam;
         this.beschrijving = beschrijving;
@@ -25,19 +45,25 @@ public class Product {
         this.ovChipkaartList = ovChipkaartList;
     }
 
-    public List<Integer> getOvChipkaartList() {
+    public Product() {
+    }
+
+    public List<OVChipkaart> getOvchipkaartList() {
         return ovChipkaartList;
     }
 
-    public void setOvChipkaartList(List<Integer> ovChipkaartList) {
+    public void setOvChipkaartList(List<OVChipkaart> ovChipkaartList) {
         this.ovChipkaartList = ovChipkaartList;
     }
 
-    public void addOvChipkaart(int ovChipkaart) {
+    public void addChipkaart(OVChipkaart ovChipkaart) {
+        if (ovChipkaartList == null) {
+            this.ovChipkaartList = new ArrayList<>();
+        }
         this.ovChipkaartList.add(ovChipkaart);
     }
 
-    public void removeChipkaart(int ovChipkaart) {
+    public void removeChipkaart(OVChipkaart ovChipkaart) {
         this.ovChipkaartList.remove(ovChipkaart);
     }
 
@@ -74,7 +100,7 @@ public class Product {
     }
 
     @Override
-    public String toString() {
-        return String.format("Product {%s, %s, %s, €%s, %s}", id, naam, beschrijving, prijs, ovChipkaartList);
+    public String toString() {;
+        return String.format("Product {%s, %s, %s, €%s}", id, naam, beschrijving, prijs);
     }
 }

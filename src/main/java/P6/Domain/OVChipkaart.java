@@ -1,16 +1,34 @@
 package P6.Domain;
 
 
+import javax.persistence.*;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "ov_chipkaart")
 public class OVChipkaart {
+    @SequenceGenerator(
+            name = "ovchipkaart_sequence",
+            sequenceName = "ovchipkaart_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "ovchipkaart_sequence"
+    )
+    @Id
+    @Column(name = "kaart_nummer")
     private int id;
+    @Column(name = "geldig_tot")
     private Date geldigTot;
     private int klasse;
     private Double saldo;
+    @ManyToOne
+    @JoinColumn(name = "reiziger_id")
     private Reiziger reiziger;
+    @ManyToMany(mappedBy = "ovChipkaartList")
     private List<Product> productList = new ArrayList<>();
 
     public OVChipkaart(int id, Date geldigTot, int klasse, Double saldo, Reiziger reiziger) {
@@ -30,6 +48,9 @@ public class OVChipkaart {
         this.productList = productList;
     }
 
+    public OVChipkaart() {
+    }
+
     public List<Product> getProductList() {
         return productList;
     }
@@ -39,13 +60,14 @@ public class OVChipkaart {
     }
 
     public void addProduct(Product product) {
+        if (productList == null || !productList.contains(product)) {
+            this.productList = new ArrayList<>();
+        }
         this.productList.add(product);
-        product.addOvChipkaart(this.id);
     }
 
     public void removeProduct(Product product) {
         this.productList.remove(product);
-        product.removeChipkaart(this.id);
     }
 
     public int getId() {
@@ -90,6 +112,14 @@ public class OVChipkaart {
 
     @Override
     public String toString() {
-        return String.format("OVChipkaart {%s, Geldig tot: %s, Klasse: %s, €%s, %s}", id, geldigTot, klasse, saldo, productList);
+        StringBuilder stringBuilder = new StringBuilder();
+        if (productList != null) {
+            for (Product p : productList) {
+                stringBuilder.append(p);
+                stringBuilder.append(", ");
+            }
+        }
+        String producten = stringBuilder.toString();
+        return String.format("OVChipkaart {%s, Geldig tot: %s, Klasse: %s, €%s, %s}", id, geldigTot, klasse, saldo, producten);
     }
 }

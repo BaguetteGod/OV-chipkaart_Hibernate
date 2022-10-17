@@ -1,6 +1,6 @@
 package P6.Data;
 
-import P5.domain.Reiziger;
+import P6.Domain.Reiziger;
 
 import java.util.List;
 

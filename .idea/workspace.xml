@@ -4,19 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b32d89e2-dbce-469a-8e94-dd46e6894bac" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mvnw" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mvnw.cmd" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/P6/Main.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/META-INF/persistence.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/hibernate.cfg.xml" afterDir="false" />
+    <list default="true" id="b32d89e2-dbce-469a-8e94-dd46e6894bac" name="Changes" comment="Initial commit">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/P6/Data/AdresDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/P6/Data/AdresDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/P6/Data/AdresDAOPsql.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/P6/Data/AdresDAOPsql.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/P6/Data/OVChipkaartDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/P6/Data/OVChipkaartDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/P6/Data/OVChipkaartDAOPsql.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/P6/Data/OVChipkaartDAOPsql.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/P6/Data/ProductDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/P6/Data/ProductDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/P6/Data/ProductDAOPsql.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/P6/Data/ProductDAOPsql.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/P6/Data/ReizigerDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/P6/Data/ReizigerDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/P6/Data/ReizigerDAOPsql.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/P6/Data/ReizigerDAOPsql.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/P6/Domain/Adres.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/P6/Domain/Adres.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/P6/Domain/OVChipkaart.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/P6/Domain/OVChipkaart.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/P6/Domain/Product.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/P6/Domain/Product.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/P6/Domain/Reiziger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/P6/Domain/Reiziger.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,11 +37,15 @@
   <component name="JpbToolWindowState">
     <option name="myId2FirstActivated">
       <map>
+        <entry key="com.haulmont.jpb.jpaInspector" value="true" />
+        <entry key="com.haulmont.jpb.jpaPalette" value="true" />
         <entry key="com.haulmont.jpb.jpaStructure" value="true" />
       </map>
     </option>
     <option name="myId2Visible">
       <map>
+        <entry key="com.haulmont.jpb.jpaInspector" value="true" />
+        <entry key="com.haulmont.jpb.jpaPalette" value="true" />
         <entry key="com.haulmont.jpb.jpaStructure" value="true" />
       </map>
     </option>
@@ -60,13 +65,15 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "dart.analysis.tool.window.visible": "false",
-    "last_opened_file_path": "C:/Users/mikav/Documents/HBO-ICT/OV-chipkaart_Hibernate/src/main/resources",
+    "last_opened_file_path": "C:/Users/mikav/Documents/HBO-ICT/OV-chipkaart_Hibernate/src/main/java/P6/Data",
     "show.migrate.to.gradle.popup": "false",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\mikav\Documents\HBO-ICT\OV-chipkaart_Hibernate\src\main\java\P6\Data" />
+      <recent name="C:\Users\mikav\Documents\HBO-ICT\OV-chipkaart_Hibernate\src\main\java\P6\Domain" />
       <recent name="C:\Users\mikav\Documents\HBO-ICT\OV-chipkaart_Hibernate\src\main\resources" />
     </key>
   </component>
@@ -79,8 +86,16 @@
       <option name="presentableId" value="Default" />
       <updated>1666025380223</updated>
       <workItem from="1666025381479" duration="1000" />
-      <workItem from="1666025532317" duration="83000" />
+      <workItem from="1666025532317" duration="2657000" />
     </task>
+    <task id="LOCAL-00001" summary="Initial commit">
+      <created>1666025748906</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1666025748906</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -96,5 +111,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Initial commit" />
+    <option name="LAST_COMMIT_MESSAGE" value="Initial commit" />
   </component>
 </project>

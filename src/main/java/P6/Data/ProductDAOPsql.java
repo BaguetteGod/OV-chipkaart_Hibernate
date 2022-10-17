@@ -1,12 +1,9 @@
 package P6.Data;
 
-import P5.domain.OVChipkaart;
-import P5.domain.Product;
+import P6.Domain.OVChipkaart;
+import P6.Domain.Product;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,28 +16,30 @@ public class ProductDAOPsql implements ProductDAO {
         this.ovcdao = ovcdao;
     }
 
-    private boolean productStatement(Product product, PreparedStatement preparedStatement) throws SQLException {
+    private void productStatement(Product product, PreparedStatement preparedStatement) throws SQLException {
         preparedStatement.setString(1, product.getNaam());
         preparedStatement.setString(2, product.getBeschrijving());
         preparedStatement.setDouble(3, product.getPrijs());
         preparedStatement.setInt(4, product.getId());
         preparedStatement.executeUpdate();
         preparedStatement.close();
-        return true;
     }
 
     @Override
     public boolean save(Product product) {
         try {
             PreparedStatement preparedStatement = conn.prepareStatement("INSERT INTO product(naam, beschrijving, prijs, product_nummer) VALUES(?, ?, ?, ?)");
+            List<OVChipkaart> ovChipkaartList = product.getOvchipkaartList();
             productStatement(product, preparedStatement);
-            List<Integer> ovChipkaartList = product.getOvChipkaartList();
-            for (Integer o : ovChipkaartList) {
-                PreparedStatement saveStatement = conn.prepareStatement("INSERT INTO ov_chipkaart_product(kaart_nummer, product_nummer) VALUES(?, ?)");
-                saveStatement.setInt(1, o);
-                saveStatement.setInt(2, product.getId());
-                saveStatement.executeUpdate();
-                saveStatement.close();
+            if (ovChipkaartList != null) {
+                for (OVChipkaart o : ovChipkaartList) {
+                    PreparedStatement productStatement = conn.prepareStatement("INSERT INTO ov_chipkaart_product(kaart_nummer, product_nummer) VALUES(?, ?)");
+                    productStatement.setInt(1, o.getId());
+                    productStatement.setInt(2, product.getId());
+                    productStatement.executeUpdate();
+                    productStatement.close();
+                    ovcdao.update(o);
+                }
             }
             return true;
         }
@@ -58,17 +57,11 @@ public class ProductDAOPsql implements ProductDAO {
         try {
             PreparedStatement preparedStatement = conn.prepareStatement("UPDATE product SET naam = ?, beschrijving = ?, prijs = ? WHERE product_nummer = ?");
             productStatement(product, preparedStatement);
-            PreparedStatement deleteStatement = conn.prepareStatement("DELETE FROM ov_chipkaart_product WHERE product_nummer = ?");
-            deleteStatement.setInt(1, product.getId());
-            deleteStatement.executeUpdate();
-            deleteStatement.close();
-            List<Integer> ovChipkaartList = product.getOvChipkaartList();
-            for (Integer o : ovChipkaartList) {
-                PreparedStatement saveStatement = conn.prepareStatement("INSERT INTO ov_chipkaart_product(kaart_nummer, product_nummer) VALUES(?, ?)");
-                saveStatement.setInt(1, o);
-                saveStatement.setInt(2, product.getId());
-                saveStatement.executeUpdate();
-                saveStatement.close();
+            List<OVChipkaart> ovChipkaartList = product.getOvchipkaartList();
+            if (ovChipkaartList != null) {
+                for (OVChipkaart o : ovChipkaartList) {
+                    ovcdao.update(o);
+                }
             }
             return true;
         }
@@ -85,13 +78,18 @@ public class ProductDAOPsql implements ProductDAO {
     public boolean delete(Product product) {
         try {
             PreparedStatement preparedStatement = conn.prepareStatement("DELETE FROM product WHERE product_nummer = ?");
-            preparedStatement.setInt(1, product.getId());
-
             PreparedStatement deleteStatement = conn.prepareStatement("DELETE FROM ov_chipkaart_product WHERE product_nummer = ?");
+            preparedStatement.setInt(1, product.getId());
             deleteStatement.setInt(1, product.getId());
             deleteStatement.executeUpdate();
             deleteStatement.close();
-
+            List<OVChipkaart> ovChipkaartList = ovcdao.findByProduct(product);
+            if (ovChipkaartList != null) {
+                for (OVChipkaart o : ovChipkaartList) {
+                    o.removeProduct(product);
+                    ovcdao.update(o);
+                }
+            }
             preparedStatement.executeUpdate();
             preparedStatement.close();
             return true;
@@ -107,24 +105,27 @@ public class ProductDAOPsql implements ProductDAO {
     @Override
     public List<Product> findAll() {
         try {
-            PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM product");
-            ResultSet resultSet = preparedStatement.executeQuery();
+            Statement statement = conn.createStatement();
+            ResultSet rs = statement.executeQuery("SELECT * from product");
             List<Product> productList = new ArrayList<>();
-            while (resultSet.next()) {
+            while (rs.next()) {
                 Product product = new Product(
-                        resultSet.getInt("product_nummer"),
-                        resultSet.getString("naam"),
-                        resultSet.getString("beschrijving"),
-                        resultSet.getDouble("prijs"));
-                PreparedStatement ovChipkaartStatement = conn.prepareStatement("SELECT kaart_nummer FROM ov_chipkaart_product WHERE product_nummer = ?");
-                ovChipkaartStatement.setInt(1, product.getId());
-                ResultSet ovChipkaartResultSet = ovChipkaartStatement.executeQuery();
-                while (ovChipkaartResultSet.next()) {
-                    product.addOvChipkaart(ovChipkaartResultSet.getInt("kaart_nummer"));
-                }
+                        rs.getInt("product_nummer"),
+                        rs.getString("naam"),
+                        rs.getString("beschrijving"),
+                        rs.getDouble("prijs"));
                 productList.add(product);
             }
 
+            for (Product p : productList) {
+                List<OVChipkaart> ovChipkaartList = ovcdao.findByProduct(p);
+                if (ovChipkaartList != null) {
+                    p.setOvChipkaartList(ovChipkaartList);
+                }
+            }
+
+            statement.close();
+            rs.close();
             return productList;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -138,26 +139,28 @@ public class ProductDAOPsql implements ProductDAO {
     @Override
     public List<Product> findByOVChipkaart(OVChipkaart ovChipkaart) {
         try {
-            PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM product WHERE product_nummer IN (SELECT product_nummer FROM ov_chipkaart_product WHERE kaart_nummer = ?)");
+            PreparedStatement preparedStatement = conn.prepareStatement("SELECT p.product_nummer, p.naam, p.beschrijving, p.prijs FROM ov_chipkaart_product as ovc JOIN product as p ON ovc.product_nummer = p.product_nummer WHERE kaart_nummer = ?");
             preparedStatement.setInt(1, ovChipkaart.getId());
-            ResultSet resultSet = preparedStatement.executeQuery();
+            ResultSet rs = preparedStatement.executeQuery();
             List<Product> productList = new ArrayList<>();
-            while (resultSet.next()) {
+            while (rs.next()) {
                 Product product = new Product(
-                        resultSet.getInt("product_nummer"),
-                        resultSet.getString("naam"),
-                        resultSet.getString("beschrijving"),
-                        resultSet.getDouble("prijs"));
-                PreparedStatement ovChipkaartStatement = conn.prepareStatement("SELECT kaart_nummer FROM ov_chipkaart_product WHERE product_nummer = ?");
-                ovChipkaartStatement.setInt(1, product.getId());
-                ResultSet ovChipkaartResultSet = ovChipkaartStatement.executeQuery();
-                while (ovChipkaartResultSet.next()) {
-                    product.addOvChipkaart(ovChipkaartResultSet.getInt("kaart_nummer"));
-                }
+                        rs.getInt("product_nummer"),
+                        rs.getString("naam"),
+                        rs.getString("beschrijving"),
+                        rs.getDouble("prijs"));
                 productList.add(product);
-                ovChipkaartResultSet.close();
-                ovChipkaartStatement.close();
             }
+
+            for (Product p : productList) {
+                List<OVChipkaart> ovChipkaartList = ovcdao.findByProduct(p);
+                if (ovChipkaartList != null) {
+                    p.setOvChipkaartList(ovChipkaartList);
+                }
+            }
+
+            preparedStatement.close();
+            rs.close();
             return productList;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -171,25 +174,25 @@ public class ProductDAOPsql implements ProductDAO {
     @Override
     public Product findById(int id) {
         try {
-            PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM product WHERE product_nummer = ?");
+            PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM product WHERE product_nummer  = ?");
             preparedStatement.setInt(1, id);
-            ResultSet resultSet = preparedStatement.executeQuery();
+            ResultSet rs = preparedStatement.executeQuery();
             Product product = null;
-            while (resultSet.next()) {
+            while (rs.next()) {
                 product = new Product(
-                        resultSet.getInt("product_nummer"),
-                        resultSet.getString("naam"),
-                        resultSet.getString("beschrijving"),
-                        resultSet.getDouble("prijs"));
-                PreparedStatement ovChipkaartStatement = conn.prepareStatement("SELECT kaart_nummer FROM ov_chipkaart_product WHERE product_nummer = ?");
-                ovChipkaartStatement.setInt(1, product.getId());
-                ResultSet ovChipkaartResultSet = ovChipkaartStatement.executeQuery();
-                while (ovChipkaartResultSet.next()) {
-                    product.addOvChipkaart(ovChipkaartResultSet.getInt("kaart_nummer"));
-                }
-                ovChipkaartResultSet.close();
-                ovChipkaartStatement.close();
+                        rs.getInt("product_nummer"),
+                        rs.getString("naam"),
+                        rs.getString("beschrijving"),
+                        rs.getDouble("prijs"));
             }
+
+            List<OVChipkaart> ovChipkaartList = ovcdao.findByProduct(product);
+            if (ovChipkaartList != null) {
+                product.setOvChipkaartList(ovChipkaartList);
+            }
+
+            preparedStatement.close();
+            rs.close();
             return product;
         } catch (SQLException e) {
             e.printStackTrace();

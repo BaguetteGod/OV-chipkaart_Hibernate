@@ -1,8 +1,8 @@
 package P6.Data;
 
-import P5.domain.OVChipkaart;
-import P5.domain.Product;
-import P5.domain.Reiziger;
+import P6.Domain.OVChipkaart;
+import P6.Domain.Product;
+import P6.Domain.Reiziger;
 
 import java.util.List;
 

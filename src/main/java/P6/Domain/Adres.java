@@ -1,11 +1,28 @@
 package P6.Domain;
 
+import javax.persistence.*;
+
+@Entity
 public class Adres {
+    @SequenceGenerator(
+            name = "adres_sequence",
+            sequenceName = "adres_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "adres_sequence"
+    )
+
+    @Id
+    @Column(name = "adres_id")
     private int id;
     private String postcode;
     private String huisnummer;
     private String straat;
     private String woonplaats;
+    @OneToOne
+    @JoinColumn(name = "reiziger_id")
     private Reiziger reiziger;
 
 
@@ -16,6 +33,10 @@ public class Adres {
         this.straat = straat;
         this.woonplaats = woonplaats;
         this.reiziger = reiziger;
+    }
+
+    public Adres() {
+
     }
 
     public int getId() {
