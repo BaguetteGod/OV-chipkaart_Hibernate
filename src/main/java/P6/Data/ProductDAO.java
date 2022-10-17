@@ -1,4 +1,4 @@
-package P5.data;
+package P6.Data;
 
 import P5.domain.OVChipkaart;
 import P5.domain.Product;

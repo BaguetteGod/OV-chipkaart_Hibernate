@@ -1,4 +1,4 @@
-package P5.domain;
+package P6.Domain;
 
 import java.util.ArrayList;
 import java.util.List;
